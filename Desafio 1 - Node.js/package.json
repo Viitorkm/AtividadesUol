@@ -1,0 +1,13 @@
+{
+  "name": "desafio-1---node",
+  "version": "1.0.0",
+  "description": "Esta é uma API simples criada utilizando apenas o módulo HTTP do Node.js, sem o uso de frameworks externos. A API oferece três endpoints principais para demonstrar operações básicas de um servidor web.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

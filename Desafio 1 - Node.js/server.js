@@ -3,6 +3,7 @@ const { URL } = require("node:url");
 
 const hostname = "127.0.0.1";
 const port = 3000;
+let counter = 0;
 
 const server = createServer((request, response) => {
   response.setHeader("Content-Type", "application/json");
@@ -40,13 +41,40 @@ const server = createServer((request, response) => {
       } else {
         return response.end(JSON.stringify({ isPrime: false }));
       }
+    } else if (request.method === "POST" && url.pathname === "/count") {
+      let body = "";
+
+      request.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+
+      request.on("end", () => {
+        try {
+          const parsedBody = body.length > 0 ? JSON.parse(body) : {};
+
+          if (
+            typeof parsedBody.incrementBy === "number" &&
+            parsedBody.incrementBy > 0 &&
+            Number.isInteger(parsedBody.incrementBy)
+          ) {
+            counter += parsedBody.incrementBy;
+            response.statusCode = 200;
+            return response.end(JSON.stringify({ counter: counter }));
+          } else {
+            throw new Error("Invalid input");
+          }
+        } catch (error) {
+          response.statusCode = 400;
+          return response.end(JSON.stringify({ error: "Invalid input" }));
+        }
+      });
     } else {
       response.statusCode = 404;
-      response.end(JSON.stringify({ error: "Rota não encontrada" }));
+      return response.end(JSON.stringify({ error: "Rota não encontrada" }));
     }
   } catch (error) {
     response.statusCode = 500;
-    response.end(JSON.stringify({ error: "Erro interno do servidor" }));
+    return response.end(JSON.stringify({ error: "Erro interno do servidor" }));
   }
 });
 
