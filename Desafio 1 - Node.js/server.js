@@ -10,7 +10,7 @@ const server = createServer((request, response) => {
   try {
     const url = new URL(request.url, `http://${hostname}:${port}`);
 
-    if (url.method == "GET" && url.pathname === "/health-check") {
+    if (request.method === "GET" && url.pathname === "/health-check") {
       response.statusCode = 200;
       const resposta = {
         success: true,
@@ -18,9 +18,31 @@ const server = createServer((request, response) => {
       };
 
       response.end(JSON.stringify(resposta));
+    } else if (
+      request.method === "GET" &&
+      url.pathname === "/is-prime-number"
+    ) {
+      let numero = url.searchParams.get("number");
+
+      let divisores = 0;
+
+      if (numero === null || isNaN(numero)) {
+        response.statusCode = 400;
+        return response.end(JSON.stringify({ error: "Invalid input" }));
+      } else {
+        numero = parseInt(numero, 10);
+      }
+
+      for (let i = 1; i <= numero; i++) if (numero % i === 0) divisores++;
+
+      if (divisores === 2) {
+        return response.end(JSON.stringify({ isPrime: true }));
+      } else {
+        return response.end(JSON.stringify({ isPrime: false }));
+      }
     } else {
       response.statusCode = 404;
-      response.end("Rota não encontrada");
+      response.end(JSON.stringify({ error: "Rota não encontrada" }));
     }
   } catch (error) {
     response.statusCode = 500;
@@ -29,5 +51,10 @@ const server = createServer((request, response) => {
 });
 
 server.listen(port, hostname, () => {
-  console.log(`http://${hostname}:${port}/rota1`);
+  console.log(
+    `Iniciado, EndPoint /health-check: http://${hostname}:${port}/health-check`
+  );
+  console.log(
+    `Iniciado, EndPoint /is-prime-number: http://${hostname}:${port}/is-prime-number`
+  );
 });
