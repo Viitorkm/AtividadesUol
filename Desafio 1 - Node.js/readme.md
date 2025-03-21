@@ -1,113 +1,95 @@
-API Simples com Node.js
-Este projeto demonstra a criação de uma API utilizando apenas o módulo HTTP nativo do Node.js, sem depender de frameworks externos como Express. É um excelente exemplo para entender os fundamentos de como as APIs funcionam no ambiente Node.js.
+# API Simples com Módulo HTTP do Node.js
 
-📋 Funcionalidades
-A API implementa três endpoints principais:
+## Descrição
 
-GET /health-check: Verifica o status do servidor
+Esta é uma API simples criada utilizando apenas o módulo HTTP do Node.js, sem o uso de frameworks externos. A API oferece três endpoints principais para demonstrar operações básicas de um servidor web.
 
-GET /is-prime-number: Determina se um número é primo
+## Tecnologias Utilizadas
 
-POST /count: Gerencia um contador que pode ser incrementado
+- Node.js
+- Módulo HTTP nativo do Node.js
 
-🚀 Como Executar
-Clone este repositório
+## Estrutura do Projeto
 
-Certifique-se de ter o Node.js instalado
+O projeto consiste em um único arquivo `server.js` que contém toda a lógica da API.
 
-Execute o servidor:
+## Funcionalidades
 
-bash
-node server.js
-O servidor estará disponível em http://localhost:3000
+### 1. Health Check
 
-📌 Endpoints
-Health Check
-Verifica se o servidor está funcionando corretamente.
+- **Endpoint**: GET /health-check
+- **Descrição**: Retorna o status de saúde da API com um timestamp.
+- **Resposta**:
+  {
+  "success": true,
+  "timestamp": "2023-05-20T10:00:00.000Z"
+  }
 
-text
-GET /health-check
-Resposta de sucesso:
+### 2. Verificação de Número Primo
 
-json
-{
-"success": true,
-"timestamp": "2025-03-21T12:55:00.000Z"
-}
-Verificação de Número Primo
-Verifica se um número fornecido é primo.
+- **Endpoint**: GET /is-prime-number
+- **Parâmetro**: number (query parameter)
+- **Descrição**: Verifica se o número fornecido é primo.
+- **Exemplos de Resposta**:
+- Número primo:
+  ```
+  {
+    "isPrime": true
+  }
+  ```
+- Número não primo:
+  ```
+  {
+    "isPrime": false
+  }
+  ```
+- Input inválido:
+  ```
+  {
+    "error": "Invalid input"
+  }
+  ```
 
-text
-GET /is-prime-number?number=7
-Resposta para número primo:
+### 3. Contador
 
-json
-{
-"isPrime": true
-}
-Resposta para número não primo:
+- **Endpoint**: POST /count
+- **Corpo da Requisição**:
+  {
+  "incrementBy": 5
+  }
 
-json
-{
-"isPrime": false
-}
-Resposta para entrada inválida:
+- **Descrição**: Incrementa um contador interno e retorna o valor atualizado.
+- **Resposta**:
+  {
+  "counter": 5
+  }
 
-json
-{
-"error": "Invalid input"
-}
-Contador
-Mantém um contador no servidor que pode ser incrementado.
+## Como Usar
 
-text
-POST /count
-Content-Type: application/json
+1. Inicie o servidor:
+   node server.js
 
-{
-"incrementBy": 5
-}
-Resposta de sucesso:
+2. A API estará disponível em `http://localhost:3000`
 
-json
-{
-"counter": 5
-}
-Resposta para entrada inválida:
+3. Exemplos de chamadas usando cURL:
 
-json
-{
-"error": "Invalid input"
-}
-🧪 Testando a API
-Você pode testar a API usando cURL:
+- Health Check:
 
-Health Check
-bash
-curl -X GET http://localhost:3000/health-check
-Verificar Número Primo
-bash
-curl -X GET "http://localhost:3000/is-prime-number?number=7"
-Incrementar Contador
-bash
-curl -X POST http://localhost:3000/count \
- -H "Content-Type: application/json" \
- -d '{"incrementBy": 5}'
-💻 Implementação
-A API foi implementada usando apenas os módulos nativos do Node.js:
+  ```
+  curl http://localhost:3000/health-check
+  ```
 
-http: Para criar o servidor e gerenciar requisições/respostas
+- Verificar Número Primo:
 
-url: Para analisar URLs e parâmetros de consulta
+  ```
+  curl "http://localhost:3000/is-prime-number?number=7"
+  ```
 
-O código utiliza técnicas como:
+- Incrementar Contador:
+  ```
+  curl -X POST -H "Content-Type: application/json" -d '{"incrementBy": 5}' http://localhost:3000/count
+  ```
 
-Manipulação de diferentes métodos HTTP (GET, POST)
+## Observações
 
-Processamento de parâmetros de consulta
-
-Análise de corpo JSON em requisições POST
-
-Formatação adequada de respostas JSON
-
-Gerenciamento de códigos de status HTTP
+- A API utiliza apenas o módulo HTTP nativo do Node.js, demonstrando a criação de um servidor web sem dependências externas.
