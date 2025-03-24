@@ -119,11 +119,11 @@ const server = createServer(async (request, response) => {
       }
     } else {
       response.statusCode = 404;
-      return response.end(JSON.stringify({ error: "Rota não encontrada" }));
+      return response.end(JSON.stringify({ error: "Rote not found" }));
     }
   } catch (error) {
     response.statusCode = 500;
-    return response.end(JSON.stringify({ error: "Erro interno do servidor" }));
+    return response.end(JSON.stringify({ error: "Internal Error" }));
   }
 });
 
