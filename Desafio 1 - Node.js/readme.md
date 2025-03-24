@@ -2,12 +2,13 @@
 
 ## Descrição
 
-Esta é uma API simples criada utilizando apenas o módulo HTTP do Node.js, sem o uso de frameworks externos. A API oferece três endpoints principais para demonstrar operações básicas de um servidor web.
+Esta é uma API simples criada utilizando apenas o módulo HTTP do Node.js, sem o uso de frameworks externos. A API oferece quatro endpoints principais para demonstrar operações básicas de um servidor web.
 
 ## Tecnologias Utilizadas
 
 - Node.js
 - Módulo HTTP nativo do Node.js
+- Fetch
 
 ## Estrutura do Projeto
 
@@ -64,6 +65,35 @@ O projeto consiste em um único arquivo `server.js` que contém toda a lógica d
   "counter": 5
   }
 
+### 4. Sugestão de Compra do Bitcoin
+
+- **Endpoint**: GET /stock-insight
+- **Parâmetro**: currency (query parameter, opcional, padrão: "usd")
+- **Descrição**: Retorna o preço do Bitcoin na moeda especificada e uma sugestão de compra com base no valor atual.
+- **Exemplos de Resposta**:
+- Para usd:
+  ```
+  {
+    "btc_price": 58000,
+    "currency": "usd",
+    "suggestion": "Bom momento para compra!"
+  }
+  ```
+- Para brl:
+  ```
+  {
+    "btc_price": 320000,
+    "currency": "brl",
+    "suggestion": "Preço razoável. Avalie antes de comprar."
+  }
+  ```
+- Input inválido:
+  ```
+  {
+    "error": "Moeda inválida"
+  }
+  ```
+
 ## Como Usar
 
 1. Inicie o servidor:
@@ -86,8 +116,14 @@ O projeto consiste em um único arquivo `server.js` que contém toda a lógica d
   ```
 
 - Incrementar Contador:
+
   ```
   curl -X POST -H "Content-Type: application/json" -d '{"incrementBy": 5}' http://localhost:3000/count
+  ```
+
+- Obter preço e recomendação do bitcoin:
+  ```
+  curl "http://localhost:3000/stock-insight?currency=usd"
   ```
 
 ## Observações
