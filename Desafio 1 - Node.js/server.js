@@ -5,7 +5,16 @@ const hostname = "127.0.0.1";
 const port = 3000;
 let counter = 0;
 
-const server = createServer((request, response) => {
+async function APIcoinGecko(currency) {
+  const response = await fetch(
+    `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${currency}`
+  );
+  const data = await response.json();
+  const btcPrice = data.bitcoin[currency];
+  return btcPrice;
+}
+
+const server = createServer(async (request, response) => {
   response.setHeader("Content-Type", "application/json");
 
   try {
@@ -37,9 +46,9 @@ const server = createServer((request, response) => {
       for (let i = 1; i <= numero; i++) if (numero % i === 0) divisores++;
 
       if (divisores === 2) {
-        return response.end(JSON.stringify({ isPrime: true }));
+        response.end(JSON.stringify({ isPrime: true }));
       } else {
-        return response.end(JSON.stringify({ isPrime: false }));
+        response.end(JSON.stringify({ isPrime: false }));
       }
     } else if (request.method === "POST" && url.pathname === "/count") {
       let body = "";
@@ -59,7 +68,7 @@ const server = createServer((request, response) => {
           ) {
             counter += parsedBody.incrementBy;
             response.statusCode = 200;
-            return response.end(JSON.stringify({ counter: counter }));
+            response.end(JSON.stringify({ counter: counter }));
           } else {
             throw new Error("Invalid input");
           }
@@ -68,6 +77,46 @@ const server = createServer((request, response) => {
           return response.end(JSON.stringify({ error: "Invalid input" }));
         }
       });
+    } else if (request.method === "GET" && url.pathname === "/stock-insight") {
+      try {
+        let suggestion;
+        const currency = (
+          url.searchParams.get("currency") ?? "usd"
+        ).toLocaleLowerCase();
+
+        if (currency !== "usd" && currency !== "brl") {
+          response.statusCode = 400;
+          return response.end(JSON.stringify({ error: "Moeda inválida" }));
+        }
+
+        const priceBtc = await APIcoinGecko(currency);
+
+        if (currency == "usd") {
+          if (priceBtc < 60000) {
+            suggestion = "Bom momento para compra!";
+          } else if (priceBtc >= 60000 && priceBtc <= 80000) {
+            suggestion = "Preço razoável. Avalie antes de comprar";
+          } else {
+            suggestion = "Bitcoin está caro. Pode ser melhor esperar.";
+          }
+        } else if (currency == "brl") {
+          if (priceBtc < 300000) {
+            suggestion = "Bom momento para compra!";
+          } else if (priceBtc >= 300000 && priceBtc <= 450000) {
+            suggestion = "Preço razoável. Avalie antes de comprar.";
+          } else {
+            suggestion = "Bitcoin está caro. Pode ser melhor esperar.";
+          }
+        }
+
+        response.statusCode = 200;
+        response.end(
+          JSON.stringify({ btc_price: priceBtc, currency, suggestion })
+        );
+      } catch {
+        response.statusCode = 400;
+        return response.end(JSON.stringify({ error: "CoinGecko API Error" }));
+      }
     } else {
       response.statusCode = 404;
       return response.end(JSON.stringify({ error: "Rota não encontrada" }));
@@ -84,5 +133,8 @@ server.listen(port, hostname, () => {
   );
   console.log(
     `Iniciado, EndPoint /is-prime-number: http://${hostname}:${port}/is-prime-number`
+  );
+  console.log(
+    `Iniciado, EndPoint /stock-insight: http://${hostname}:${port}/stock-insight`
   );
 });
