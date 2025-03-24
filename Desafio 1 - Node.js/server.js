@@ -3,8 +3,10 @@ const { URL } = require("node:url");
 
 const hostname = "127.0.0.1";
 const port = 3000;
+
 let counter = 0;
 
+//Função que retorna o valor atual do bitcoin (Utiliza a API oficial da coingecko)
 async function APIcoinGecko(currency) {
   const response = await fetch(
     `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${currency}`
@@ -22,6 +24,7 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "GET" && url.pathname === "/health-check") {
       response.statusCode = 200;
+      //Retorna a saude atual do servidor
       const resposta = {
         success: true,
         timestamp: new Date().toISOString(),
@@ -36,6 +39,7 @@ const server = createServer(async (request, response) => {
 
       let divisores = 0;
 
+      //Verifica se o numero é valido e faz a conversão
       if (numero === null || isNaN(numero)) {
         response.statusCode = 400;
         return response.end(JSON.stringify({ error: "Invalid input" }));
@@ -43,8 +47,10 @@ const server = createServer(async (request, response) => {
         numero = parseInt(numero, 10);
       }
 
+      //Verifica quantos divisores o numero tem
       for (let i = 1; i <= numero; i++) if (numero % i === 0) divisores++;
 
+      //Verifica se o numero é primo ou não
       if (divisores === 2) {
         response.end(JSON.stringify({ isPrime: true }));
       } else {
@@ -60,7 +66,7 @@ const server = createServer(async (request, response) => {
       request.on("end", () => {
         try {
           const parsedBody = body.length > 0 ? JSON.parse(body) : {};
-
+          //Verifica se o numero é valido e soma no contador, se não retorna um erro
           if (
             typeof parsedBody.incrementBy === "number" &&
             parsedBody.incrementBy > 0 &&
@@ -79,11 +85,12 @@ const server = createServer(async (request, response) => {
       });
     } else if (request.method === "GET" && url.pathname === "/stock-insight") {
       try {
-        let suggestion;
+        let suggestion; //Valor para armazenar a sugestão
         const currency = (
           url.searchParams.get("currency") ?? "usd"
         ).toLocaleLowerCase();
 
+        //Verifica se a moeda inserida é valida
         if (currency !== "usd" && currency !== "brl") {
           response.statusCode = 400;
           return response.end(JSON.stringify({ error: "Moeda inválida" }));
@@ -91,6 +98,7 @@ const server = createServer(async (request, response) => {
 
         const priceBtc = await APIcoinGecko(currency);
 
+        //Faz a recomendação com base no preço da moeda
         if (currency == "usd") {
           if (priceBtc < 60000) {
             suggestion = "Bom momento para compra!";
@@ -128,13 +136,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, hostname, () => {
-  console.log(
-    `Iniciado, EndPoint /health-check: http://${hostname}:${port}/health-check`
-  );
-  console.log(
-    `Iniciado, EndPoint /is-prime-number: http://${hostname}:${port}/is-prime-number`
-  );
-  console.log(
-    `Iniciado, EndPoint /stock-insight: http://${hostname}:${port}/stock-insight`
-  );
+  console.log(`Server is running at http://${hostname}:${port}`);
 });
